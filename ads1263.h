@@ -6,7 +6,7 @@
 
 /* ____________________ DEFINE Section ____________________ */
 
-/* Registers*/
+/* Registers */
 #define ADS1263_ID          (0x00)
 #define ADS1263_POWER       (0x01)
 #define ADS1263_INTERFACE   (0x02)
@@ -35,7 +35,7 @@
 #define ADS1263_ADC2FSC0    (0x19)
 #define ADS1263_ADC2FSC1    (0x1A)
 
-/*Commands*/
+/* Commands */
 #define ADS1263_NOP_CMD         (0x00)
 #define ADS1263_RESET_CMD       (0x06)      //Or 0x07
 #define ADS1263_START1_CMD      (0x08)      //Or 0x09
@@ -52,6 +52,16 @@
 #define ADS1263_SFOCAL2_CMD     (0x1E)
 
 
+/* Const */
+#define ADS1263_READ_ADD                (0x20)
+#define ADS1263_WRITE_ADD               (0x40)
+#define ADS1263_READCMD_LEN             (2)
+#define ADS1263_ONE_REG_STATE_LEN       (3)
+
+#define ADS1263_HIGH                    (1)
+#define ADS1263_LOW                     (0)
+
+
 
 
 
@@ -64,78 +74,77 @@
 typedef struct {
 	uint8_t devId;
 	uint8_t revId;
-} id_state_t;
+} id_t;
 
 typedef struct {
 	uint8_t reset;
-	uint8_t reserved;
     uint8_t vBias;
     uint8_t intRef;
-} power_state_t;
+} power_t;
 
 typedef struct {
     uint8_t timeOut;
     uint8_t status;
     uint8_t crc;
-}   interface_state_t;
+}   interface_t;
 
 typedef struct {
     uint8_t refRev;
     uint8_t runMode;
     uint8_t chop;
     uint8_t delay;
-} mode0_state_t;
+} mode0_t;
 
 typedef struct {
     uint8_t filter;
     uint8_t sBADC;
     uint8_t sBPol;
     uint8_t sBMag;
-} mode1_state_t;
+} mode1_t;
 
 typedef struct {
     uint8_t byPass;
     uint8_t gain;
     uint8_t dr;
-} mode2_state_t;
+} mode2_t;
 
 typedef struct {
     uint8_t muxP;
     uint8_t muxN;
-} inpmux_state_t;
+} inpmux_t;
 
 typedef struct {
     uint32_t ofc;
-} ofcal_state_t;
+} ofcal_t;
 
 typedef struct {
     uint32_t fscal;
-} fscal_state_t;
+} fscal_t;
 
 typedef struct {
     uint8_t mux1;
     uint8_t mux2;
-} idacmux_state_t;
+} idacmux_t;
 
 typedef struct {
     uint8_t mag1;
     uint8_t mag2;
-} idacmag_state_t;
+} idacmag_t;
 
 typedef struct {
     uint8_t rMuxP;
     uint8_t rMuxN;
-} refmux_state_t;
+} refmux_t;
 
 typedef struct {
     uint8_t outP;
     uint8_t magP;
-} tdacp_state_t;
+} tdacp_t;
 
 typedef struct {
     uint8_t outN;
     uint8_t magN;
-}   tdacn_state_t;
+} tdacn_t;
 
 typedef struct {
     uint8_t con0;
@@ -146,7 +155,7 @@ typedef struct {
     uint8_t con5;
     uint8_t con6;
     uint8_t con7;
-} gpiocon_state_t;
+} gpiocon_t;
 
 typedef struct {
     uint8_t dir0;
@@ -157,7 +166,7 @@ typedef struct {
     uint8_t dir5;
     uint8_t dir6;
     uint8_t dir7;
-} gpiodir_state_t;
+} gpiodir_t;
 
 typedef struct {
     uint8_t dat0;
@@ -167,54 +176,54 @@ typedef struct {
     uint8_t dat5;
     uint8_t dat6;
     uint8_t dat7;
-} gpiodat_state_t;
+} gpiodat_t;
 
 typedef struct {
     uint8_t dr2;
     uint8_t ref2;
     uint8_t gain2;
-} adc2fg_state_t;
+} adc2cfg_t;
 
 typedef struct {
     uint8_t muxP2;
     uint8_t muxN2;
-} adc2mux_state_t;
+} adc2mux_t;
 
 typedef struct {
     uint16_t ofc2;
-} adc2ofc_state_t;
+} adc2ofc_t;
 
 typedef struct {
     uint16_t fsc2;
-} adc2fsc_state_t;
+} adc2fsc_t;
 
 
 
 typedef struct {
-    void (*WriteReg)( //TODO);
-	uint8_t (*ReadReg)(//TODO);
+    void (*Transfer)(uint8_t tx[], uint8_t rx[], uint8_t len);
+    void (*CS_Out)(uint8_t out);
 
-    id_state_t id_state;
-    power_state_t power_state;
-    interface_state_t interface_state;
-    mode0_state_t mode0_state;
-    mode1_state_t mode1_state;
-    mode2_state_t mode2_state;
-    inpmux_state_t inpmux_state;
-    ofcal_state_t ofcal_state;
-    fscal_state_t fscal_state;
-    idacmux_state_t idacmux_state;
-    idacmag_state_t idacmag_state;
-    refmux_state_t refmux_state;
-    tdacp_state_t tdacp_state;
-    tdacn_state_t tdacn_state;
-    gpiocon_state_t gpiocon_state;
-    gpiodir_state_t gpiodir_state;
-    gpiodat_state_t gpiodat_state;
-    adc2cfg_state_t adc2cfg_state;
-    adc2mux_state_t adc2mux_state;
-    adc2ofc_state_t adc2ofc_state;
-    adc2fsc_state_t adc2fsc_state;
+    id_t id;
+    power_t power;
+    interface_t interface;
+    mode0_t mode0_;
+    mode1_t mode1;
+    mode2_t mode2;
+    inpmux_t inpmux;
+    ofcal_t ofcal;
+    fscal_t fscal;
+    idacmux_t idacmux;
+    idacmag_t idacmag;
+    refmux_t refmux;
+    tdacp_t tdacp;
+    tdacn_t tdacn;
+    gpiocon_t gpiocon;
+    gpiodir_t gpiodir;
+    gpiodat_t gpiodat;
+    adc2cfg_t adc2cfg;
+    adc2mux_t adc2mux;
+    adc2ofc_t adc2ofc;
+    adc2fsc_t adc2fsc;
 } ads1263_t;
 
 /* ________________________________________________________ */
@@ -223,8 +232,8 @@ typedef struct {
 
 /* __________________ Prototypes Section __________________ */
 
-void ADS1263_ReadReg(uint8_t regAddress, uint8_t numOfRegToRead);
-void ADS1263_WriteReg(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t data[], uint8_t len);
+void ADS1263_ReadRegCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[]);
+void ADS1263_WriteRegCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[]);
 
 void ADS1263_GetAllStates(ads1263_t * ads1263);
 void ADS1263_GetIdState(ads1263_t * ads1263);
