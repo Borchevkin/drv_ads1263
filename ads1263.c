@@ -1,6 +1,95 @@
 
 #include "ads1263.h"
 
+
+
+/*!
+\brief Creating of Read Register Command
+\param [in] regAddress Address of register to read
+\param [in] numOfRegToRead Number of register to read (starting from "regAddress" register)
+\param [out] readCmd[] Initialized array for read command
+*/
+
+void ADS1263_GetReadRegsCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[])
+{
+    readCmd[1] = numOfRegToRead - 1;        //according to datasheet (OPCODE2 byte for RREG Command)
+    readCmd[0] = 0x00;
+}
+
+/*!
+\brief Creating of Write Register Command
+\param [in] regAddress Address of register to write
+\param [in] numOfRegToWrite Number of register to write (starting from "regAddress" register)
+\param [in] data[] Data array
+\param [out] writeCmd[] Initialized array for write command
+\warning Tricky function. Len of cmd array calculates this way: 2 + numOfRegToWrite. 
+*/
+
+//TODO check this function. Very tricky
+
+void ADS1263_GetWriteRegsCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[])
+{
+    writeCmd[0] = ADS1263_WRITE_ADD | regAddress;
+    writeCmd[1] = numOfRegToWrite - 1;       //according to datasheet (OPCODE2 byte for WREG Command)
+
+    for(uint8_t i = 2; i <= numOfRegToWrite + 2; i++)
+	{
+	    writeCmd[i] = data[i-2];
+	}    
+}
+
+/*!
+\brief Function for reading register data
+\param [in] regAddress Address of register to read
+\return Value of wanted register
+*/
+
+uint8_t ADS1263_ReadReg(uint8_t regAddress)
+{
+    uint8_t data = 0;
+    uint8_t readCmd[3] = {0};
+    uint8_t rx[3] = {0};
+
+    readCmd[0] = ADS1263_READ_ADD | regAddress;
+    readCmd[1] = 0x00;        //according to datasheet (OPCODE2 byte for RREG Command for one register)
+    readCmd[0] = 0x00;
+
+    
+
+    ads1263->Transfer(readIdCmd, rx, 3);
+
+    data = rx[2];
+
+    return data;
+}
+
+/*!
+\brief Function for writing data to register
+\param [in] regAddress Address of register to read
+\param [in] data[] Data 
+*/
+
+void ADS1263_WriteReg(uint8_t regAddress, uint8_t data)
+{
+    uint8_t writeCmd[3] = {0};
+    uint8_t rx[3] = {0};
+
+    writeCmd[0] = ADS1263_WRITE_ADD | regAddress;
+    writeCmd[1] = 0x00;                  //according to datasheet (OPCODE2 byte for WREG Command for one register)
+    writeCmd[2] = data;
+    
+    ads1263->Transfer(writeCmd, rx, 3);
+}
+
+
+
+
+
+
+/* --------------- Parsing Functions Section --------------- */
+
+
+
 /*!
 \brief Parsing of ID Register result
 \param [out] ads1263 Initialized variable of type ads1263_t
@@ -231,90 +320,314 @@ void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal)
     ads1263->adc2mux.muxN2      = (regVal & 0x0F);
 }
 
-/*!
-\brief Creating of Read Register Command
-\param [in] regAddress Address of register to read
-\param [in] numOfRegToRead Number of register to read (starting from "regAddress" register)
-\param [out] readCmd[] Initialized array for read command
-*/
+/* ---------------------------------------------------------- */
 
-void ADS1263_ReadRegCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[])
-{
-    readCmd[0] =  ADS1263_READ_ADD | regAddress;
-    readCmd[1] = numOfRegToRead - 1;        //according to datasheet (OPCODE2 byte for RREG Command)
-}
+
+
+/* -------- Reading Register Data Functions Section -------- */
+
+
 
 /*!
-\brief Creating of Write Register Command
-\param [in] regAddress Address of register to write
-\param [in] numOfRegToWrite Number of register to write (starting from "regAddress" register)
-\param [in] data[] Data array
-\param [out] writeCmd[] Initialized array for write command
-\warning Tricky function. Len of cmd array calculates this way: 2 + numOfRegToWrite. 
+\brief Function for getting Device Identification Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
 */
-
-//TODO check this function. Very tricky
-
-void ADS1263_WriteRegCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[])
-{
-    //len = numOfRegToWrite + 2;
-
-    writeCmd[0] =  ADS1263_WRITE_ADD | regAddress;
-    writeCmd[1] = numOfRegToWrite - 1;                  //according to datasheet (OPCODE2 byte for WREG Command)
-
-    for(uint8_t i = 2; i <= numOfRegToWrite + 2; i++)
-	{
-		writeCmd[i] = data[i-2];
-	}    
-}
-
-
-//TODO
-
-void ADS1263_GetAllStates(ads1263_t * ads1263);
-{
-
-}
 
 void ADS1263_GetIdState(ads1263_t * ads1263)
 {
-    uint8_t buffer;
-    uint8_t readIdCmd[3] = {0};
-    uint8_t rx[3] = {0};
-
-    ADS1263_ReadRegCmd(ADS1263_ID, 1, readIdCmd);
-
-	buffer = ads1263->Transfer(readIdCmd, rx, ADS1263_ONE_REG_STATE_LEN);
-
-    //Keep the DIN (12 pin) input low after the two opcode bytes are sent
-
-	return buffer;
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_ID);
+    ADS1263_ParseIdReg(ads1263, buffer);
 }
+
+/*!
+\brief Function for getting Power Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
 
 void ADS1263_GetPowerState(ads1263_t * ads1263)
 {
-
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_POWER);
+    ADS1263_ParsePowerReg(ads1263, buffer);
 }
 
-void ADS1263_GetInterfaceState(ads1263_t * ads1263);
-void ADS1263_GetMode0State(ads1263_t * ads1263);
-void ADS1263_GetMode1State(ads1263_t * ads1263);
-void ADS1263_GetMode2State(ads1263_t * ads1263);
-void ADS1263_GetInputMuxState(ads1263_t * ads1263);
-void ADS1263_GetOffsetCalState(ads1263_t * ads1263);
-void ADS1263_GetFSCalState(ads1263_t * ads1263);
-void ADS1263_GetIDACMuxState(ads1263_t * ads1263);
-void ADS1263_GetIDACMagState(ads1263_t * ads1263);
-void ADS1263_GetRefMuxState(ads1263_t * ads1263);
-void ADS1263_GetTDACPState(ads1263_t * ads1263);
-void ADS1263_GetTDACNState(ads1263_t * ads1263);
-void ADS1263_GetGpioConState(ads1263_t * ads1263);
-void ADS1263_GetGpioDirState(ads1263_t * ads1263);
-void ADS1263_GetGpioDatState(ads1263_t * ads1263);
-void ADS1263_GetAdc2CfgState(ads1263_t * ads1263);
-void ADS1263_GetAdc2MuxState(ads1263_t * ads1263);
-void ADS1263_GetAdc2OffsetCalState(ads1263_t * ads1263);
-void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263);
+/*!
+\brief Function for getting Interface Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetInterfaceState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_INTERFACE);
+    ADS1263_ParseInterfaceReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Mode0 Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetMode0State(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_MODE0);
+    ADS1263_ParseMode0Reg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Mode1 Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetMode1State(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_MODE1);
+    ADS1263_ParseMode1Reg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Mode2 Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetMode2State(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_MODE2);
+    ADS1263_ParseMode2Reg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Input Multiplexer Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetInputMuxState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_INPMUX);
+    ADS1263_ParseInputMuxReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Offset Calibration Register data
+
+Three registers compose the 24-bit offset calibration word. The
+24-bit word is twos complement format, and is internally left-
+shifted to align with the 32-bit conversion result. The ADC
+subtracts the register value from the 32-bit conversion result
+before the full-scale operation.
+
+\param [out] ads1263 Initialized variable of type ads1263_t
+\warning final word for register: LSB - OFCAL0 register data, MSB - OFCAL2 register data. Need to test
+*/
+
+void ADS1263_GetOffsetCalState(ads1263_t * ads1263)
+{
+    uint8_t ofcal0 = 0;
+    uint8_t ofcal1 = 0;
+    uint8_t ofcal2 = 0;
+
+    ofcal0 = ADS1263_ReadReg(ADS1263_OFCAL0);
+    ofcal1 = ADS1263_ReadReg(ADS1263_OFCAL1);
+    ofcal2 = ADS1263_ReadReg(ADS1263_OFCAL2);
+
+    ads1263->ofcal.ofc   = ofcal2 << 16 | ofcal1 << 8 | ofcal0;
+}
+
+/*!
+\brief Function for getting Full-Scale Calibration Register data
+
+Three 8-bit registers compose the 24-bit full scale calibration
+word. The 24-bit word format is straight binary. The ADC divides
+the 24-bit value by 400000h to derive the gain coefficient. The
+ADC multiplies the gain coefficient by the 32-bit conversion
+result after the offset operation.
+
+\param [out] ads1263 Initialized variable of type ads1263_t
+\warning final word for register: LSB - FSCAL0 register data, MSB - FSCAL2 register data. Need to test
+*/
+
+void ADS1263_GetFSCalState(ads1263_t * ads1263)
+{
+    uint8_t fscal0 = 0;
+    uint8_t fscal1 = 0;
+    uint8_t fscal2 = 0;
+
+    fscal0 = ADS1263_ReadReg(ADS1263_FSCAL0);
+    fscal1 = ADS1263_ReadReg(ADS1263_FSCAL1);
+    fscal2 = ADS1263_ReadReg(ADS1263_FSCAL2);
+
+    ads1263->fscal.fscal  = fscal2 << 16 | fscal1 << 8 | fscal0;
+}
+
+/*!
+\brief Function for getting  IDAC Multiplexer Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetIDACMuxState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_IDACMUX);
+    ADS1263_ParseIDACMuxReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting  IDAC Magnitude Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetIDACMagState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_IDACMAG);
+    ADS1263_ParseIDACMagReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting Reference Multiplexer Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetRefMuxState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_REFMUX);
+    ADS1263_ParseRefMuxReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting TDAC Positive Output Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetTDACPState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_TDACP);
+    ADS1263_ParseTDACPReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting TDAC Negative Output Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetTDACNState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_TDACN);
+    ADS1263_ParseTDACNReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting  GPIO Connection Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetGpioConState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_GPIOCON);
+    ADS1263_ParseGpioConReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting  GPIO Direction Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetGpioDirState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_GPIODIR);
+    ADS1263_ParseGpioDirReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting  GPIO Data Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetGpioDatState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_GPIODAT);
+    ADS1263_ParseGpioDatReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting ADC2 Configuration Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetAdc2CfgState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_ADC2CFG);
+    ADS1263_ParseAdc2CfgReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting ADC2 Input Multiplexer Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_GetAdc2MuxState(ads1263_t * ads1263)
+{
+    uint8_t buffer = 0;
+    buffer = ADS1263_ReadReg(ADS1263_ADC2MUX);
+    ADS1263_ParseAdc2MuxReg(ads1263, buffer);
+}
+
+/*!
+\brief Function for getting  ADC2 Offset Calibration Registers data. 
+
+Two registers compose the ADC2 16-bit offset calibration word. 
+The 16-bit word is twos complement format and is internally left-shifted to align with the ADC2 24-bit conversion result.
+The ADC subtracts the register value from the conversion result before full-scale operation.
+
+\param [out] ads1263 Initialized variable of type ads1263_t
+\warning final word for register: LSB - ADC2OFC0 register data, MSB - ADC2OFC1 register data. Need to test
+*/
+
+void ADS1263_GetAdc2OffsetCalState(ads1263_t * ads1263)
+{
+    uint8_t adc2ofc0 = 0;
+    uint8_t adc2ofc1 = 0;
+
+    adc2ofc0 = ADS1263_ReadReg(ADS1263_ADC2OFC0);
+    adc2ofc1 = ADS1263_ReadReg(ADS1263_ADC2OFC1);
+
+    ads1263->adc2ofc.ofc2  = adc2ofc1 << 8 | adc2ofc0;
+}
+
+/*!
+\brief Function for getting  ADC2 Offset Calibration Registers data.
+
+Two registers compose the ADC2 16-bit full scale calibration word. The 16-bit word format is straight binary.  
+The ADC divides the 16-bit value by 4000h to derive the scale factor for calibration. 
+After the offset operation, the ADC multiplies the scale factor by the conversion result.
+
+\param [out] ads1263 Initialized variable of type ads1263_t
+\warning final word for register: LSB - ADC2FSC0 register data, MSB - ADC2FSC1 register data. Need to test
+ 
+*/
 
 
-void ADS1263_GetOfCalState(ads1263_t * ads1263);
+void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263)
+{
+    uint8_t adc2fsc0 = 0;
+    uint8_t adc2fsc1 = 0;
+
+    adc2fsc0 = ADS1263_ReadReg(ADS1263_ADC2FSC0);
+    adc2fsc1 = ADS1263_ReadReg(ADS1263_ADC2FSC1);
+
+    ads1263->adc2fsc.fsc2  = adc2fsc1 << 8 | adc2fsc0;
+}
+
+/* --------------------------------------------------------- */

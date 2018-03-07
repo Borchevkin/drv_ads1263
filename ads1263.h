@@ -7,33 +7,33 @@
 /* ____________________ DEFINE Section ____________________ */
 
 /* Registers */
-#define ADS1263_ID          (0x00)
-#define ADS1263_POWER       (0x01)
-#define ADS1263_INTERFACE   (0x02)
-#define ADS1263_MODE0       (0x03)
-#define ADS1263_MODE1       (0x04)
-#define ADS1263_MODE2       (0x05)
-#define ADS1263_INPMUX      (0x06)
-#define ADS1263_OFCAL0      (0x07)
-#define ADS1263_OFCAL1      (0x08)
-#define ADS1263_OFCAL2      (0x09)
-#define ADS1263_FSCAL0      (0x0A)
-#define ADS1263_FSCAL1      (0x0B)
-#define ADS1263_FSCAL2      (0x0C)
-#define ADS1263_IDACMUX     (0x0D)
-#define ADS1263_IDACMAG     (0x0E)
-#define ADS1263_REFMUX      (0x0F)
-#define ADS1263_TDACP       (0x10)
-#define ADS1263_TDACN       (0x11)
-#define ADS1263_GPIOCON     (0x12)
-#define ADS1263_GPIODIR     (0x13)
-#define ADS1263_GPIODAT     (0x14)
-#define ADS1263_ADC2CFG     (0x15)
-#define ADS1263_ADC2MUX     (0x16)
-#define ADS1263_ADC2OFC0    (0x17)
-#define ADS1263_ADC2OFC1    (0x18)
-#define ADS1263_ADC2FSC0    (0x19)
-#define ADS1263_ADC2FSC1    (0x1A)
+#define ADS1263_ID              (0x00)
+#define ADS1263_POWER           (0x01)
+#define ADS1263_INTERFACE       (0x02)
+#define ADS1263_MODE0           (0x03)
+#define ADS1263_MODE1           (0x04)
+#define ADS1263_MODE2           (0x05)
+#define ADS1263_INPMUX          (0x06)
+#define ADS1263_OFCAL0          (0x07)
+#define ADS1263_OFCAL1          (0x08)
+#define ADS1263_OFCAL2          (0x09)
+#define ADS1263_FSCAL0          (0x0A)
+#define ADS1263_FSCAL1          (0x0B)
+#define ADS1263_FSCAL2          (0x0C)
+#define ADS1263_IDACMUX         (0x0D)
+#define ADS1263_IDACMAG         (0x0E)
+#define ADS1263_REFMUX          (0x0F)
+#define ADS1263_TDACP           (0x10)
+#define ADS1263_TDACN           (0x11)
+#define ADS1263_GPIOCON         (0x12)
+#define ADS1263_GPIODIR         (0x13)
+#define ADS1263_GPIODAT         (0x14)
+#define ADS1263_ADC2CFG         (0x15)
+#define ADS1263_ADC2MUX         (0x16)
+#define ADS1263_ADC2OFC0        (0x17)
+#define ADS1263_ADC2OFC1        (0x18)
+#define ADS1263_ADC2FSC0        (0x19)
+#define ADS1263_ADC2FSC1        (0x1A)
 
 /* Commands */
 #define ADS1263_NOP_CMD         (0x00)
@@ -53,19 +53,17 @@
 
 
 /* Const */
-#define ADS1263_READ_ADD                (0x20)
-#define ADS1263_WRITE_ADD               (0x40)
-#define ADS1263_READCMD_LEN             (2)
-#define ADS1263_ONE_REG_STATE_LEN       (3)
+#define ADS1263_READ_ADD        (0x20)
+#define ADS1263_WRITE_ADD       (0x40)
 
-#define ADS1263_HIGH                    (1)
-#define ADS1263_LOW                     (0)
-
-
+#define ADS1263_HIGH            (1)
+#define ADS1263_LOW             (0)
 
 
 
 /* ________________________________________________________ */
+
+
 
 
 
@@ -230,12 +228,18 @@ typedef struct {
 
 
 
+
+
 /* __________________ Prototypes Section __________________ */
 
-void ADS1263_ReadRegCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[]);
-void ADS1263_WriteRegCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[]);
+uint8_t ADS1263_ReadReg(uint8_t regAddress);
+void ADS1263_WriteReg(uint8_t regAddress, uint8_t data);
 
-void ADS1263_GetAllStates(ads1263_t * ads1263);
+void ADS1263_GetReadRegsCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[]);
+void ADS1263_GetWriteRegsCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[]);
+
+/*          Reading Register Data Functions Section          */
+
 void ADS1263_GetIdState(ads1263_t * ads1263);
 void ADS1263_GetPowerState(ads1263_t * ads1263);
 void ADS1263_GetInterfaceState(ads1263_t * ads1263);
@@ -258,8 +262,11 @@ void ADS1263_GetAdc2MuxState(ads1263_t * ads1263);
 void ADS1263_GetAdc2OffsetCalState(ads1263_t * ads1263);
 void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263);
 
+/* --------------------------------------------------------- */
 
-void ADS1263_GetOfCalState(ads1263_t * ads1263);
+
+
+/*                 Parsing Functions Section                 */
 
 void ADS1263_ParseIdReg(ads1263_t * ads1263, uint8_t regVal);
 void ADS1263_ParsePowerReg(ads1263_t * ads1263, uint8_t regVal);
@@ -278,6 +285,9 @@ void ADS1263_ParseGpioDirReg(ads1263_t * ads1263, uint8_t regVal);
 void ADS1263_ParseGpioDatReg(ads1263_t * ads1263, uint8_t regVal);
 void ADS1263_ParseAdc2CfgReg(ads1263_t * ads1263, uint8_t regVal);
 void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal);
+
+/* -------------------------------------------------------- */
+
 
 /* ________________________________________________________ */
 
