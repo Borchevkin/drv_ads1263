@@ -1,7 +1,24 @@
-
 #include "ads1263.h"
 
+/*!
+\brief Reset ADS126X by control RESET pin
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+void ADS1263_HardReset(ads1263_t * ads1263)
+{
+    ads1263->SetReset(0);
+    ads1263->DelayMs(1000);
+    ads1263->SetReset(1);
+}
 
+/*!
+\brief Reset ADS126X by command sequence
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+void ADS1263_SoftReset(ads1263_t * ads1263)
+{
+    //TODO implement
+}
 
 /*!
 \brief Creating of Read Register Command
@@ -54,9 +71,9 @@ uint8_t ADS1263_ReadReg(uint8_t regAddress)
     readCmd[1] = 0x00;        //according to datasheet (OPCODE2 byte for RREG Command for one register)
     readCmd[0] = 0x00;
 
-    
-
+    ads1263->SetCS(0);
     ads1263->Transfer(readIdCmd, rx, 3);
+    ads1263->SetCS(1);
 
     data = rx[2];
 
@@ -78,7 +95,9 @@ void ADS1263_WriteReg(uint8_t regAddress, uint8_t data)
     writeCmd[1] = 0x00;                  //according to datasheet (OPCODE2 byte for WREG Command for one register)
     writeCmd[2] = data;
     
+    ads1263->SetCS(0);
     ads1263->Transfer(writeCmd, rx, 3);
+    ads1263->SetCS(1);
 }
 
 
