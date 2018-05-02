@@ -26,7 +26,7 @@ BSD-2 Clause. See LICENCE file for additional information
 
 ## Embedding information
 
-For worrk with this driver you should finish followning steps:
+For work with this driver you should finish followning steps:
 
 1. Clone this repository
 
@@ -40,15 +40,28 @@ For worrk with this driver you should finish followning steps:
 
     * The ADC latches input data on the *falling edge of SCLK*. During direct-mode data readback, when no command is intended, keep **DIN* in  *LOW* state.
 
-1. Implement following functions: 
+1. Define  ```ads1263_t ads1263``` (often in global scope)
 
-    * TBA
+1. Define and implement following functions with signatures (names of functions may be specific for you):
 
-    * TBA
+    * ```spiTransfer(uint8_t tx, uint8_t rx, uint8_t len)``` - transfer data over SPI
 
-    * TBA
+    * ```setCS(uint8_t state)``` - control CS line. When ```state``` equals to ```1``` a state of line is *HIGH*
 
-1. Init main structure with pointers to your implemented functions at prevous step
+    * ```setReset(uint8_t state)``` - control RESET line. When ```state``` equals to ```1``` a state of line is *HIGH*
+
+    * ```delayMs(uint32_t delay)``` - delay in milliseconds
+
+1. Init main structure with pointers to your implemented functions at prevous step:
+
+```c
+ads1263.Transfer = spiTransfer;
+ads1263.SetCS = setCS;
+ads1263.SetReset = setReset;
+ads1263.DelayMs = delayMs;
+
+ADS1263_Init(&ads1263);
+```
 
 1. Explore the ***ads1263.c*** which has Doxygen comments for working with needed functions
 

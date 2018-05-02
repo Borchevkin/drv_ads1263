@@ -159,6 +159,7 @@ typedef struct {
 
 typedef struct {
     uint8_t dat0;
+    uint8_t dat1;
     uint8_t dat2;
     uint8_t dat3;
     uint8_t dat4;
@@ -197,7 +198,7 @@ typedef struct {
     id_t id;
     power_t power;
     interface_t interface;
-    mode0_t mode0_;
+    mode0_t mode0;
     mode1_t mode1;
     mode2_t mode2;
     inpmux_t inpmux;
@@ -226,9 +227,10 @@ typedef struct {
 /* __________________ Prototypes Section __________________ */
 void ADS1263_HardReset(ads1263_t * ads1263);
 void ADS1263_SoftReset(ads1263_t * ads1263);
+void ADS1263_Init(ads1263_t * ads1263);
 
-uint8_t ADS1263_ReadReg(uint8_t regAddress);
-void ADS1263_WriteReg(uint8_t regAddress, uint8_t data);
+uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data);
 
 void ADS1263_GetReadRegsCmd(uint8_t regAddress, uint8_t numOfRegToRead, uint8_t readCmd[]);
 void ADS1263_GetWriteRegsCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_t data[], uint8_t writeCmd[]);

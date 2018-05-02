@@ -21,6 +21,21 @@ void ADS1263_SoftReset(ads1263_t * ads1263)
 }
 
 /*!
+\brief Init ADS126X according to datasheet's sequence
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+void ADS1263_Init(ads1263_t * ads1263)
+{
+    //TODO implement
+
+    // Check null pointer functions
+
+    // Hard reset
+    ADS1263_HardReset(ads1263);
+
+}
+
+/*!
 \brief Creating of Read Register Command
 \param [in] regAddress Address of register to read
 \param [in] numOfRegToRead Number of register to read (starting from "regAddress" register)
@@ -61,7 +76,7 @@ void ADS1263_GetWriteRegsCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_
 \return Value of wanted register
 */
 
-uint8_t ADS1263_ReadReg(uint8_t regAddress)
+uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress)
 {
     uint8_t data = 0;
     uint8_t readCmd[3] = {0};
@@ -72,7 +87,7 @@ uint8_t ADS1263_ReadReg(uint8_t regAddress)
     readCmd[0] = 0x00;
 
     ads1263->SetCS(0);
-    ads1263->Transfer(readIdCmd, rx, 3);
+    ads1263->Transfer(readCmd, rx, 3);
     ads1263->SetCS(1);
 
     data = rx[2];
@@ -86,7 +101,7 @@ uint8_t ADS1263_ReadReg(uint8_t regAddress)
 \param [in] data[] Data 
 */
 
-void ADS1263_WriteReg(uint8_t regAddress, uint8_t data)
+void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data)
 {
     uint8_t writeCmd[3] = {0};
     uint8_t rx[3] = {0};
@@ -232,8 +247,9 @@ void ADS1263_ParseIDACMagReg(ads1263_t * ads1263, uint8_t regVal)
 
 void ADS1263_ParseRefMuxReg(ads1263_t * ads1263, uint8_t regVal)
 {
-    ads1263->idacmux.rMuxP       = (regVal & 0x38) >> 3;
-    ads1263->idacmux.rMuxN       = (regVal & 0x07);
+    // TODO check this
+    ads1263->refmux.rMuxP       = (regVal & 0x38) >> 3;
+    ads1263->refmux.rMuxN       = (regVal & 0x07);
 }
 
 /*!
@@ -355,7 +371,7 @@ void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal)
 void ADS1263_GetIdState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_ID);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_ID);
     ADS1263_ParseIdReg(ads1263, buffer);
 }
 
@@ -367,7 +383,7 @@ void ADS1263_GetIdState(ads1263_t * ads1263)
 void ADS1263_GetPowerState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_POWER);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_POWER);
     ADS1263_ParsePowerReg(ads1263, buffer);
 }
 
@@ -379,7 +395,7 @@ void ADS1263_GetPowerState(ads1263_t * ads1263)
 void ADS1263_GetInterfaceState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_INTERFACE);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_INTERFACE);
     ADS1263_ParseInterfaceReg(ads1263, buffer);
 }
 
@@ -391,7 +407,7 @@ void ADS1263_GetInterfaceState(ads1263_t * ads1263)
 void ADS1263_GetMode0State(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_MODE0);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_MODE0);
     ADS1263_ParseMode0Reg(ads1263, buffer);
 }
 
@@ -403,7 +419,7 @@ void ADS1263_GetMode0State(ads1263_t * ads1263)
 void ADS1263_GetMode1State(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_MODE1);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_MODE1);
     ADS1263_ParseMode1Reg(ads1263, buffer);
 }
 
@@ -415,7 +431,7 @@ void ADS1263_GetMode1State(ads1263_t * ads1263)
 void ADS1263_GetMode2State(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_MODE2);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_MODE2);
     ADS1263_ParseMode2Reg(ads1263, buffer);
 }
 
@@ -427,7 +443,7 @@ void ADS1263_GetMode2State(ads1263_t * ads1263)
 void ADS1263_GetInputMuxState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_INPMUX);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_INPMUX);
     ADS1263_ParseInputMuxReg(ads1263, buffer);
 }
 
@@ -450,9 +466,9 @@ void ADS1263_GetOffsetCalState(ads1263_t * ads1263)
     uint8_t ofcal1 = 0;
     uint8_t ofcal2 = 0;
 
-    ofcal0 = ADS1263_ReadReg(ADS1263_OFCAL0);
-    ofcal1 = ADS1263_ReadReg(ADS1263_OFCAL1);
-    ofcal2 = ADS1263_ReadReg(ADS1263_OFCAL2);
+    ofcal0 = ADS1263_ReadReg(ads1263, ADS1263_OFCAL0);
+    ofcal1 = ADS1263_ReadReg(ads1263, ADS1263_OFCAL1);
+    ofcal2 = ADS1263_ReadReg(ads1263, ADS1263_OFCAL2);
 
     ads1263->ofcal.ofc   = ofcal2 << 16 | ofcal1 << 8 | ofcal0;
 }
@@ -476,9 +492,9 @@ void ADS1263_GetFSCalState(ads1263_t * ads1263)
     uint8_t fscal1 = 0;
     uint8_t fscal2 = 0;
 
-    fscal0 = ADS1263_ReadReg(ADS1263_FSCAL0);
-    fscal1 = ADS1263_ReadReg(ADS1263_FSCAL1);
-    fscal2 = ADS1263_ReadReg(ADS1263_FSCAL2);
+    fscal0 = ADS1263_ReadReg(ads1263, ADS1263_FSCAL0);
+    fscal1 = ADS1263_ReadReg(ads1263, ADS1263_FSCAL1);
+    fscal2 = ADS1263_ReadReg(ads1263, ADS1263_FSCAL2);
 
     ads1263->fscal.fscal  = fscal2 << 16 | fscal1 << 8 | fscal0;
 }
@@ -491,7 +507,7 @@ void ADS1263_GetFSCalState(ads1263_t * ads1263)
 void ADS1263_GetIDACMuxState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_IDACMUX);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_IDACMUX);
     ADS1263_ParseIDACMuxReg(ads1263, buffer);
 }
 
@@ -503,7 +519,7 @@ void ADS1263_GetIDACMuxState(ads1263_t * ads1263)
 void ADS1263_GetIDACMagState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_IDACMAG);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_IDACMAG);
     ADS1263_ParseIDACMagReg(ads1263, buffer);
 }
 
@@ -515,7 +531,7 @@ void ADS1263_GetIDACMagState(ads1263_t * ads1263)
 void ADS1263_GetRefMuxState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_REFMUX);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_REFMUX);
     ADS1263_ParseRefMuxReg(ads1263, buffer);
 }
 
@@ -527,7 +543,7 @@ void ADS1263_GetRefMuxState(ads1263_t * ads1263)
 void ADS1263_GetTDACPState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_TDACP);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_TDACP);
     ADS1263_ParseTDACPReg(ads1263, buffer);
 }
 
@@ -539,7 +555,7 @@ void ADS1263_GetTDACPState(ads1263_t * ads1263)
 void ADS1263_GetTDACNState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_TDACN);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_TDACN);
     ADS1263_ParseTDACNReg(ads1263, buffer);
 }
 
@@ -551,7 +567,7 @@ void ADS1263_GetTDACNState(ads1263_t * ads1263)
 void ADS1263_GetGpioConState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_GPIOCON);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_GPIOCON);
     ADS1263_ParseGpioConReg(ads1263, buffer);
 }
 
@@ -563,7 +579,7 @@ void ADS1263_GetGpioConState(ads1263_t * ads1263)
 void ADS1263_GetGpioDirState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_GPIODIR);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_GPIODIR);
     ADS1263_ParseGpioDirReg(ads1263, buffer);
 }
 
@@ -575,7 +591,7 @@ void ADS1263_GetGpioDirState(ads1263_t * ads1263)
 void ADS1263_GetGpioDatState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_GPIODAT);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_GPIODAT);
     ADS1263_ParseGpioDatReg(ads1263, buffer);
 }
 
@@ -587,7 +603,7 @@ void ADS1263_GetGpioDatState(ads1263_t * ads1263)
 void ADS1263_GetAdc2CfgState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_ADC2CFG);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_ADC2CFG);
     ADS1263_ParseAdc2CfgReg(ads1263, buffer);
 }
 
@@ -599,7 +615,7 @@ void ADS1263_GetAdc2CfgState(ads1263_t * ads1263)
 void ADS1263_GetAdc2MuxState(ads1263_t * ads1263)
 {
     uint8_t buffer = 0;
-    buffer = ADS1263_ReadReg(ADS1263_ADC2MUX);
+    buffer = ADS1263_ReadReg(ads1263, ADS1263_ADC2MUX);
     ADS1263_ParseAdc2MuxReg(ads1263, buffer);
 }
 
@@ -619,8 +635,8 @@ void ADS1263_GetAdc2OffsetCalState(ads1263_t * ads1263)
     uint8_t adc2ofc0 = 0;
     uint8_t adc2ofc1 = 0;
 
-    adc2ofc0 = ADS1263_ReadReg(ADS1263_ADC2OFC0);
-    adc2ofc1 = ADS1263_ReadReg(ADS1263_ADC2OFC1);
+    adc2ofc0 = ADS1263_ReadReg(ads1263, ADS1263_ADC2OFC0);
+    adc2ofc1 = ADS1263_ReadReg(ads1263, ADS1263_ADC2OFC1);
 
     ads1263->adc2ofc.ofc2  = adc2ofc1 << 8 | adc2ofc0;
 }
@@ -643,8 +659,8 @@ void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263)
     uint8_t adc2fsc0 = 0;
     uint8_t adc2fsc1 = 0;
 
-    adc2fsc0 = ADS1263_ReadReg(ADS1263_ADC2FSC0);
-    adc2fsc1 = ADS1263_ReadReg(ADS1263_ADC2FSC1);
+    adc2fsc0 = ADS1263_ReadReg(ads1263, ADS1263_ADC2FSC0);
+    adc2fsc1 = ADS1263_ReadReg(ads1263, ADS1263_ADC2FSC1);
 
     ads1263->adc2fsc.fsc2  = adc2fsc1 << 8 | adc2fsc0;
 }
