@@ -6,9 +6,9 @@ This project is purposed to implement driver for [ADS1263](http://www.ti.com/pro
 
 This driver develop by [Lab409](http://lab409.ru):
 
-    * Natalia Bannikova
+* Natalia Bannikova
 
-    * Danil Borchevkin
+* Danil Borchevkin
 
 ## Licence
 
@@ -16,13 +16,13 @@ BSD-2 Clause. See LICENCE file for additional information
 
 ## What's included
 
-    * ***./ads1263.h*** - header file of the driver 
+* ***./ads1263.h*** - header file of the driver 
 
-    * ***./ads1263.c*** - code file of the driver 
+* ***./ads1263.c*** - code file of the driver 
 
-    * ***./LICENCE*** - licence file
+* ***./LICENCE*** - licence file
 
-    * ***./README.md*** - this file  
+* ***./README.md*** - this file  
 
 ## Embedding information
 
@@ -54,14 +54,14 @@ For work with this driver you should finish followning steps:
 
 1. Init main structure with pointers to your implemented functions at prevous step:
 
-```c
-ads1263.Transfer = spiTransfer;
-ads1263.SetCS = setCS;
-ads1263.SetReset = setReset;
-ads1263.DelayMs = delayMs;
+    ```c
+    ads1263.Transfer = spiTransfer;
+    ads1263.SetCS = setCS;
+    ads1263.SetReset = setReset;
+    ads1263.DelayMs = delayMs;
 
-ADS1263_Init(&ads1263);
-```
+    ADS1263_Init(&ads1263);
+    ```
 
 1. Explore the ***ads1263.c*** which has Doxygen comments for working with needed functions
 
