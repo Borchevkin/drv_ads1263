@@ -84,7 +84,7 @@ uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress)
 
     readCmd[0] = ADS1263_READ_ADD | regAddress;
     readCmd[1] = 0x00;        //according to datasheet (OPCODE2 byte for RREG Command for one register)
-    readCmd[0] = 0x00;
+    readCmd[2] = 0x00;
 
     ads1263->SetCS(0);
     ads1263->Transfer(readCmd, rx, 3);
