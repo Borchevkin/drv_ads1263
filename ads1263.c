@@ -27,7 +27,7 @@ void ADS1263_SoftReset(ads1263_t * ads1263)
 void ADS1263_Init(ads1263_t * ads1263)
 {
     //TODO implement
-
+    ads1263->SetStart(0);
     // Check null pointer functions
 
     // Hard reset

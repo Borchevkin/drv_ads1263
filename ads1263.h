@@ -194,6 +194,7 @@ typedef struct {
     void (*Transfer)(uint8_t tx[], uint8_t rx[], uint8_t len);
     void (*SetCS)(uint8_t state);
     void (*SetReset)(uint8_t state);
+    void (*SetStart)(uint8_t state);
 
     id_t id;
     power_t power;
