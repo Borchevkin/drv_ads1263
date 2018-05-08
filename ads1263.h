@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* ____________________ DEFINE Section ____________________ */
-/* Registers */
+/* Register addresses */
 #define ADS1263_ID              (0x00)
 #define ADS1263_POWER           (0x01)
 #define ADS1263_INTERFACE       (0x02)
@@ -32,6 +32,12 @@
 #define ADS1263_ADC2OFC1        (0x18)
 #define ADS1263_ADC2FSC0        (0x19)
 #define ADS1263_ADC2FSC1        (0x1A)
+
+/* Register settings */
+#define ADS1263_IDACMUX_SETUP   (0xB4)      //IDAC1 and AIN4
+#define ADS1263_IDACMAG_SETUP   (0x06)      //IDAC1 and 1 mA
+#define ADS1263_IDACMAG_ZERO    (0x00)      //IDAC1 and 0 A
+#define ADS1263_MODE0_SETUP     (0x40)      //Pulse conversion (one shot)
 
 /* Commands */
 #define ADS1263_NOP_CMD         (0x00)
@@ -230,6 +236,9 @@ void ADS1263_HardReset(ads1263_t * ads1263);
 void ADS1263_SoftReset(ads1263_t * ads1263);
 void ADS1263_Init(ads1263_t * ads1263);
 
+void ADS1263_StartAdc1(ads1263_t * ads1263);
+void ADS1263_StopAdc1(ads1263_t * ads1263);
+void ADS1263_ReadAdc1(ads1263_t * ads1263);
 uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress);
 void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data);
 
@@ -258,6 +267,12 @@ void ADS1263_GetAdc2CfgState(ads1263_t * ads1263);
 void ADS1263_GetAdc2MuxState(ads1263_t * ads1263);
 void ADS1263_GetAdc2OffsetCalState(ads1263_t * ads1263);
 void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263);
+/* --------------------------------------------------------- */
+
+/*          Setting Register Data Functions Section          */
+void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetMode0State(ads1263_t * ads1263);
 /* --------------------------------------------------------- */
 
 /*                 Parsing Functions Section                 */

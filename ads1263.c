@@ -33,6 +33,10 @@ void ADS1263_Init(ads1263_t * ads1263)
     // Hard reset
     ADS1263_HardReset(ads1263);
 
+    // IDAC Setup
+    ADS1263_SetIDACMuxState(ads1263, ADS1263_IDACMUX_SETUP);  //IDAC1 and AIN4
+    ADS1263_SetIDACMagState(ads1263, ADS1263_IDACMAG_SETUP);  //IDAC1 and 1 mA
+    ADS1263_SetMode0State(ads1263);                           //Pulse conversion (one shot)
 }
 
 /*!
@@ -79,15 +83,16 @@ void ADS1263_GetWriteRegsCmd(uint8_t regAddress, uint8_t numOfRegToWrite, uint8_
 uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress)
 {
     uint8_t data = 0;
-    uint8_t readCmd[3] = {0};
-    uint8_t rx[3] = {0};
+    uint8_t readCmd[4] = {0};
+    uint8_t rx[4] = {0};
 
     readCmd[0] = ADS1263_READ_ADD | regAddress;
     readCmd[1] = 0x00;        //according to datasheet (OPCODE2 byte for RREG Command for one register)
     readCmd[2] = 0x00;
+    readCmd[3] = 0x00;
 
     ads1263->SetCS(0);
-    ads1263->Transfer(readCmd, rx, 3);
+    ads1263->Transfer(readCmd, rx, 4);
     ads1263->SetCS(1);
 
     data = rx[2];
@@ -116,7 +121,51 @@ void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data)
 }
 
 
+void ADS1263_ReadAdc1(ads1263_t * ads1263)
+{
+    uint8_t readCmd[7] = {0};
+    uint8_t rx[7] = {0};
 
+    readCmd[0] = ADS1263_RDATA1_CMD;
+    readCmd[1] = 0x00;        //according to datasheet (OPCODE2 byte for RREG Command for one register)
+    readCmd[2] = 0x00;
+    readCmd[3] = 0x00;
+    readCmd[4] = 0x00;
+    readCmd[5] = 0x00;
+    readCmd[6] = 0x00;
+
+    ads1263->SetCS(0);
+    ads1263->Transfer(readCmd, rx, 7);
+    ads1263->SetCS(1);
+}
+
+void ADS1263_StartAdc1(ads1263_t * ads1263)
+{
+    uint8_t writeCmd[3] = {0};
+    uint8_t rx[3] = {0};
+
+    writeCmd[0] = ADS1263_START1_CMD;
+    writeCmd[1] = 0x00;                  //according to datasheet (OPCODE2 byte for WREG Command for one register)
+    writeCmd[2] = 0x00;
+
+    ads1263->SetCS(0);
+    ads1263->Transfer(writeCmd, rx, 3);
+    ads1263->SetCS(1);
+}
+
+void ADS1263_StopAdc1(ads1263_t * ads1263)
+{
+    uint8_t writeCmd[3] = {0};
+    uint8_t rx[3] = {0};
+
+    writeCmd[0] = ADS1263_STOP1_CMD;
+    writeCmd[1] = 0x00;                  //according to datasheet (OPCODE2 byte for WREG Command for one register)
+    writeCmd[2] = 0x00;
+
+    ads1263->SetCS(0);
+    ads1263->Transfer(writeCmd, rx, 3);
+    ads1263->SetCS(1);
+}
 
 
 
@@ -357,6 +406,34 @@ void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal)
 
 /* ---------------------------------------------------------- */
 
+
+/* -------- Setting Register Data Functions Section -------- */
+
+/*!
+\brief Function for setting  IDAC Multiplexer Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_IDACMUX, regAddress);
+}
+
+/*!
+\brief Function for setting  IDAC Magnitude Register data
+\param [out] ads1263 Initialized variable of type ads1263_t
+*/
+
+void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_IDACMAG, regAddress);
+}
+
+void ADS1263_SetMode0State(ads1263_t * ads1263)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_MODE0, ADS1263_MODE0_SETUP);
+}
+/* ---------------------------------------------------------- */
 
 
 /* -------- Reading Register Data Functions Section -------- */
