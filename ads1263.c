@@ -26,17 +26,25 @@ void ADS1263_SoftReset(ads1263_t * ads1263)
 */
 void ADS1263_Init(ads1263_t * ads1263)
 {
-    //TODO implement
-    ads1263->SetStart(0);
     // Check null pointer functions
+    ads1263->SetStart(0);
 
     // Hard reset
     ADS1263_HardReset(ads1263);
 
+    // Reset indicator setup
+    ADS1263_SetPowerState(ads1263, ADS1263_POWER_SETUP);
+
     // IDAC Setup
-    ADS1263_SetIDACMuxState(ads1263, ADS1263_IDACMUX_SETUP);  //IDAC1 and AIN4
-    ADS1263_SetIDACMagState(ads1263, ADS1263_IDACMAG_SETUP);  //IDAC1 and 1 mA
-    ADS1263_SetMode0State(ads1263);                           //Pulse conversion (one shot)
+    //ADS1263_SetIDACMuxState(ads1263, ADS1263_IDACMUX_SETUP);  //IDAC1 and AIN4
+    //ADS1263_SetIDACMagState(ads1263, ADS1263_IDACMAG_SETUP);  //IDAC1 and 1 mA
+
+    // Test DAC
+    //ADS1263_SetTDACNState(ads1263, ADS1263_TDACN_SETUP);  //AIN7 and 1.5V
+
+    // ADC setup
+    ADS1263_SetInputMuxState(ads1263, ADS1263_INPMUX_DEFAULT);
+    ADS1263_SetMode0State(ads1263, ADS1263_MODE0_SETUP);      //Pulse conversion (one shot)
 }
 
 /*!
@@ -167,6 +175,18 @@ void ADS1263_StopAdc1(ads1263_t * ads1263)
     ads1263->SetCS(1);
 }
 
+/*!
+\brief Function for checking Reset state. If device reset occurred - the reinitialization is performed
+*/
+
+void ADS1263_CheckReset(ads1263_t * ads1263)
+{
+    ADS1263_GetPowerState(ads1263);
+    if (ads1263->power.reset == 0x01)
+    {
+        ADS1263_Init(ads1263);
+    }
+}
 
 
 /* --------------- Parsing Functions Section --------------- */
@@ -411,7 +431,7 @@ void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal)
 
 /*!
 \brief Function for setting  IDAC Multiplexer Register data
-\param [out] ads1263 Initialized variable of type ads1263_t
+\param [in] regAddress Address of register to read
 */
 
 void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress)
@@ -421,7 +441,7 @@ void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress)
 
 /*!
 \brief Function for setting  IDAC Magnitude Register data
-\param [out] ads1263 Initialized variable of type ads1263_t
+\param [in] regAddress Address of register to read
 */
 
 void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress)
@@ -429,10 +449,41 @@ void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress)
     ADS1263_WriteReg(ads1263, ADS1263_IDACMAG, regAddress);
 }
 
-void ADS1263_SetMode0State(ads1263_t * ads1263)
+void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regAddress)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_MODE0, ADS1263_MODE0_SETUP);
+    ADS1263_WriteReg(ads1263, ADS1263_INPMUX, regAddress);
 }
+
+void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_POWER, regAddress);
+}
+
+void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_MODE0, regAddress);
+}
+
+void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_MODE1, regAddress);
+}
+
+void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_MODE2, regAddress);
+}
+
+void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_TDACP, regAddress);
+}
+
+void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regAddress)
+{
+    ADS1263_WriteReg(ads1263, ADS1263_TDACN, regAddress);
+}
+
 /* ---------------------------------------------------------- */
 
 

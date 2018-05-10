@@ -34,10 +34,25 @@
 #define ADS1263_ADC2FSC1        (0x1A)
 
 /* Register settings */
+#define ADS1263_POWER_SETUP     (0x01)      //Set Reset indicator to 0
+#define ADS1263_POWER_DEFAULT   (0x11)      //Set Reset indicator to 1 (Default state)
+#define ADS1263_INPMUX_DEFAULT  (0x01)      //Default MUX setup (MUXP - AIN0 and MUXN - AIN1)
+#define ADS1263_INPMUX_SETUP    (0x23)      //MUXP - AIN2 and MUXN - AIN3
 #define ADS1263_IDACMUX_SETUP   (0xB4)      //IDAC1 and AIN4
 #define ADS1263_IDACMAG_SETUP   (0x06)      //IDAC1 and 1 mA
 #define ADS1263_IDACMAG_ZERO    (0x00)      //IDAC1 and 0 A
 #define ADS1263_MODE0_SETUP     (0x40)      //Pulse conversion (one shot)
+#define ADS1263_MODE0_DEFAULT   (0x00)      //Continuous conversion (default)
+#define ADS1263_MODE1_SINC1     (0x00)      //Sinc1 mode
+#define ADS1263_MODE1_SINC2     (0x20)      //Sinc2 mode
+#define ADS1263_MODE1_SINC3     (0x40)      //Sinc3 mode
+#define ADS1263_MODE1_SINC4     (0x60)      //Sinc4 mode
+#define ADS1263_MODE1_DEFAULT   (0x80)      //FIR mode (default)
+#define ADS1263_MODE2_DEFAULT   (0x04)      //PGA bypass enabled, 1V/V, 20 SPS (default)
+#define ADS1263_TDACP_SETUP     (0x80)      //Set TDACP output to pin AIN6 (2.5 V)
+#define ADS1263_TDACP_DEFAULT   (0x00)      //Default state (off)
+#define ADS1263_TDACN_SETUP     (0x98)      //Set TDACP output to pin AIN6 (1.5 V)
+#define ADS1263_TDACN_DEFAULT   (0x00)      //Default state (off)
 
 /* Commands */
 #define ADS1263_NOP_CMD         (0x00)
@@ -236,6 +251,7 @@ void ADS1263_HardReset(ads1263_t * ads1263);
 void ADS1263_SoftReset(ads1263_t * ads1263);
 void ADS1263_Init(ads1263_t * ads1263);
 
+void ADS1263_CheckReset(ads1263_t * ads1263);
 void ADS1263_StartAdc1(ads1263_t * ads1263);
 void ADS1263_StopAdc1(ads1263_t * ads1263);
 void ADS1263_ReadAdc1(ads1263_t * ads1263);
@@ -270,9 +286,15 @@ void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263);
 /* --------------------------------------------------------- */
 
 /*          Setting Register Data Functions Section          */
+void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regAddress);
 void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress);
 void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetMode0State(ads1263_t * ads1263);
+void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regAddress);
 /* --------------------------------------------------------- */
 
 /*                 Parsing Functions Section                 */
