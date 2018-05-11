@@ -35,13 +35,6 @@ void ADS1263_Init(ads1263_t * ads1263)
     // Reset indicator setup
     ADS1263_SetPowerState(ads1263, ADS1263_POWER_SETUP);
 
-    // IDAC Setup
-    //ADS1263_SetIDACMuxState(ads1263, ADS1263_IDACMUX_SETUP);  //IDAC1 and AIN4
-    //ADS1263_SetIDACMagState(ads1263, ADS1263_IDACMAG_SETUP);  //IDAC1 and 1 mA
-
-    // Test DAC
-    //ADS1263_SetTDACNState(ads1263, ADS1263_TDACN_SETUP);  //AIN7 and 1.5V
-
     // ADC setup
     ADS1263_SetInputMuxState(ads1263, ADS1263_INPMUX_DEFAULT);
     ADS1263_SetMode0State(ads1263, ADS1263_MODE0_SETUP);      //Pulse conversion (one shot)
@@ -128,8 +121,11 @@ void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data)
     ads1263->SetCS(1);
 }
 
+/*!
+\brief Function for reading the ADC value from the register.
+*/
 
-void ADS1263_ReadAdc1(ads1263_t * ads1263)
+uint32_t ADS1263_ReadAdc1(ads1263_t * ads1263)
 {
     uint8_t readCmd[7] = {0};
     uint8_t rx[7] = {0};
@@ -145,7 +141,19 @@ void ADS1263_ReadAdc1(ads1263_t * ads1263)
     ads1263->SetCS(0);
     ads1263->Transfer(readCmd, rx, 7);
     ads1263->SetCS(1);
+
+    ads1263->adc1data.data = 0;
+    ads1263->adc1data.data |= rx[2] << 24;
+    ads1263->adc1data.data |= rx[3] << 16;
+    ads1263->adc1data.data |= rx[4] << 8;
+    ads1263->adc1data.data |= rx[5];
+
+    return ads1263->adc1data.data;
 }
+
+/*!
+\brief Function for triggering ADC1 conversion.
+*/
 
 void ADS1263_StartAdc1(ads1263_t * ads1263)
 {
@@ -160,6 +168,10 @@ void ADS1263_StartAdc1(ads1263_t * ads1263)
     ads1263->Transfer(writeCmd, rx, 3);
     ads1263->SetCS(1);
 }
+
+/*!
+\brief Function for stopping ADC1 conversion.
+*/
 
 void ADS1263_StopAdc1(ads1263_t * ads1263)
 {
@@ -190,8 +202,6 @@ void ADS1263_CheckReset(ads1263_t * ads1263)
 
 
 /* --------------- Parsing Functions Section --------------- */
-
-
 
 /*!
 \brief Parsing of ID Register result
@@ -427,61 +437,96 @@ void ADS1263_ParseAdc2MuxReg(ads1263_t * ads1263, uint8_t regVal)
 /* ---------------------------------------------------------- */
 
 
-/* -------- Setting Register Data Functions Section -------- */
+/* -------- Setting Register Value Functions Section -------- */
 
 /*!
-\brief Function for setting  IDAC Multiplexer Register data
-\param [in] regAddress Address of register to read
+\brief Function for setting  IDAC Multiplexer Register value
+\param [in] regVal Value of register to set
 */
 
-void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress)
+void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_IDACMUX, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_IDACMUX, regVal);
 }
 
 /*!
-\brief Function for setting  IDAC Magnitude Register data
-\param [in] regAddress Address of register to read
+\brief Function for setting  IDAC Magnitude Register value
+\param [in] regVal Value of register to set
 */
 
-void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress)
+void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_IDACMAG, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_IDACMAG, regVal);
 }
 
-void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting Input Multiplexer Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_INPMUX, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_INPMUX, regVal);
 }
 
-void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting Power Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_POWER, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_POWER, regVal);
 }
 
-void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting Mode0 Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_MODE0, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_MODE0, regVal);
 }
 
-void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting Mode1 Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_MODE1, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_MODE1, regVal);
 }
 
-void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting Mode2 Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_MODE2, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_MODE2, regVal);
 }
 
-void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting TDAC Positive Output Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_TDACP, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_TDACP, regVal);
 }
 
-void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regAddress)
+/*!
+\brief Function for setting TDAC Negative Output Register value
+\param [in] regVal Value of register to set
+*/
+
+void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regVal)
 {
-    ADS1263_WriteReg(ads1263, ADS1263_TDACN, regAddress);
+    ADS1263_WriteReg(ads1263, ADS1263_TDACN, regVal);
 }
 
 /* ---------------------------------------------------------- */

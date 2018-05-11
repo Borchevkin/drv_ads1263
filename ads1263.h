@@ -82,6 +82,10 @@
 /* ____________________ Types  Section ____________________ */
 
 typedef struct {
+    uint32_t data;
+} adc1data_t;
+
+typedef struct {
 	uint8_t devId;
 	uint8_t revId;
 } id_t;
@@ -217,6 +221,7 @@ typedef struct {
     void (*SetReset)(uint8_t state);
     void (*SetStart)(uint8_t state);
 
+    adc1data_t adc1data;
     id_t id;
     power_t power;
     interface_t interface;
@@ -254,7 +259,7 @@ void ADS1263_Init(ads1263_t * ads1263);
 void ADS1263_CheckReset(ads1263_t * ads1263);
 void ADS1263_StartAdc1(ads1263_t * ads1263);
 void ADS1263_StopAdc1(ads1263_t * ads1263);
-void ADS1263_ReadAdc1(ads1263_t * ads1263);
+uint32_t ADS1263_ReadAdc1(ads1263_t * ads1263);
 uint8_t ADS1263_ReadReg(ads1263_t * ads1263, uint8_t regAddress);
 void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data);
 
@@ -286,15 +291,15 @@ void ADS1263_GetAdc2FSCalState(ads1263_t * ads1263);
 /* --------------------------------------------------------- */
 
 /*          Setting Register Data Functions Section          */
-void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regAddress);
-void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regAddress);
+void ADS1263_SetPowerState(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetInputMuxState(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetIDACMuxState(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetIDACMagState(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetMode0State(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetMode1State(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetMode2State(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetTDACPState(ads1263_t * ads1263, uint8_t regVal);
+void ADS1263_SetTDACNState(ads1263_t * ads1263, uint8_t regVal);
 /* --------------------------------------------------------- */
 
 /*                 Parsing Functions Section                 */

@@ -50,6 +50,8 @@ For work with this driver you should finish followning steps:
 
     * ```setReset(uint8_t state)``` - control RESET line. When ```state``` equals to ```1``` a state of line is *HIGH*
 
+    * ```setStart(uint8_t state)``` - control START line. When ```state``` equals to ```1``` a state of line is *HIGH*
+
     * ```delayMs(uint32_t delay)``` - delay in milliseconds
 
 1. Init main structure with pointers to your implemented functions at prevous step:
@@ -58,6 +60,7 @@ For work with this driver you should finish followning steps:
     ads1263.Transfer = spiTransfer;
     ads1263.SetCS = setCS;
     ads1263.SetReset = setReset;
+    ads1263.SetStart = setStart;
     ads1263.DelayMs = delayMs;
 
     ADS1263_Init(&ads1263);
