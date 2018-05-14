@@ -51,7 +51,7 @@
 #define ADS1263_MODE2_DEFAULT   (0x04)      //PGA bypass enabled, 1V/V, 20 SPS (default)
 #define ADS1263_TDACP_SETUP     (0x80)      //Set TDACP output to pin AIN6 (2.5 V)
 #define ADS1263_TDACP_DEFAULT   (0x00)      //Default state (off)
-#define ADS1263_TDACN_SETUP     (0x98)      //Set TDACP output to pin AIN6 (1.5 V)
+#define ADS1263_TDACN_SETUP     (0x98)      //Set TDACP output to pin AIN7 (1.5 V)
 #define ADS1263_TDACN_DEFAULT   (0x00)      //Default state (off)
 
 /* Commands */
