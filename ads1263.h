@@ -39,8 +39,9 @@
 #define ADS1263_INPMUX_DEFAULT  (0x01)      //Default MUX setup (MUXP - AIN0 and MUXN - AIN1)
 #define ADS1263_INPMUX_SETUP    (0x23)      //MUXP - AIN2 and MUXN - AIN3
 #define ADS1263_IDACMUX_SETUP   (0xB4)      //IDAC1 and AIN4
+#define ADS1263_IDACMUX_DEFAULT (0xBB)      //IDAC disabled (Default state)
 #define ADS1263_IDACMAG_SETUP   (0x06)      //IDAC1 and 1 mA
-#define ADS1263_IDACMAG_ZERO    (0x00)      //IDAC1 and 0 A
+#define ADS1263_IDACMAG_DEFAULT (0x00)      //IDAC disabled (Default state)
 #define ADS1263_MODE0_SETUP     (0x40)      //Pulse conversion (one shot)
 #define ADS1263_MODE0_DEFAULT   (0x00)      //Continuous conversion (default)
 #define ADS1263_MODE1_SINC1     (0x00)      //Sinc1 mode
@@ -48,6 +49,7 @@
 #define ADS1263_MODE1_SINC3     (0x40)      //Sinc3 mode
 #define ADS1263_MODE1_SINC4     (0x60)      //Sinc4 mode
 #define ADS1263_MODE1_DEFAULT   (0x80)      //FIR mode (default)
+#define ADS1263_MODE2_SETUP     (0x09)      //PGA bypass enabled, 1V/V, 1200 SPS (Not working with FIR)
 #define ADS1263_MODE2_DEFAULT   (0x04)      //PGA bypass enabled, 1V/V, 20 SPS (default)
 #define ADS1263_TDACP_SETUP     (0x80)      //Set TDACP output to pin AIN6 (2.5 V)
 #define ADS1263_TDACP_DEFAULT   (0x00)      //Default state (off)
