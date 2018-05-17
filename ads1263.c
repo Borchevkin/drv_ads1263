@@ -34,10 +34,6 @@ void ADS1263_Init(ads1263_t * ads1263)
 
     // Reset indicator setup
     ADS1263_SetPowerState(ads1263, ADS1263_POWER_SETUP);
-
-    // ADC setup
-    ADS1263_SetInputMuxState(ads1263, ADS1263_INPMUX_DEFAULT);
-    ADS1263_SetMode0State(ads1263, ADS1263_MODE0_SETUP);      //Pulse conversion (one shot)
 }
 
 /*!
@@ -127,6 +123,7 @@ void ADS1263_WriteReg(ads1263_t * ads1263, uint8_t regAddress, uint8_t data)
 
 uint32_t ADS1263_ReadAdc1(ads1263_t * ads1263)
 {
+    int32_t msg = 0;
     uint8_t readCmd[7] = {0};
     uint8_t rx[7] = {0};
 
@@ -142,13 +139,12 @@ uint32_t ADS1263_ReadAdc1(ads1263_t * ads1263)
     ads1263->Transfer(readCmd, rx, 7);
     ads1263->SetCS(1);
 
-    ads1263->adc1data.data = 0;
-    ads1263->adc1data.data |= rx[2] << 24;
-    ads1263->adc1data.data |= rx[3] << 16;
-    ads1263->adc1data.data |= rx[4] << 8;
-    ads1263->adc1data.data |= rx[5];
+    msg |= rx[2] << 24;
+    msg |= rx[3] << 16;
+    msg |= rx[4] << 8;
+    msg |= rx[5];
 
-    return ads1263->adc1data.data;
+    return msg;
 }
 
 /*!
